@@ -8,7 +8,6 @@ import base64
 import json
 import random
 import string
-# import csv
 from urllib.request import urlopen, Request
 from urllib.error import HTTPError, URLError
 
@@ -36,7 +35,10 @@ DOCKERCOMPOSEVERSION = "2.12.2"
 
 # -------------------------------- Argument Parser --------------------------------- #
 
-formatter = lambda prog: argparse.HelpFormatter(prog, max_help_position=64)
+
+def formatter(prog): return argparse.HelpFormatter(prog, max_help_position=64)
+
+
 parser = argparse.ArgumentParser(prog=f"{NAME}", formatter_class=formatter)
 
 
@@ -76,7 +78,6 @@ gp.add_argument(
     action="store_true",
     help="Setup X-Ui with the official installer script",
 )
-
 
 vmess = parser.add_argument_group("VMess")
 
@@ -119,15 +120,6 @@ vmess.add_argument(
     help="Optional PORT for v2ray Config. defualt: [80]",
 )
 
-# vmess.add_argument(
-#     "--domain",
-#     "--domain-websocket",
-#     action="store",
-#     type=str,
-#     metavar="",
-#     help="Use Domain insted of IP for WebSocket. default: [ServerIP]",
-# )
-
 vmess.add_argument(
     "--dns", action="store", type=str, metavar="", help="Optional DNS. default: [nodns]"
 )
@@ -155,7 +147,7 @@ vmess.add_argument(
 vmess.add_argument(
     "--id",
     "--alterid",
-    action  ="store",
+    action="store",
     type=int,
     metavar="",
     help="Optional alterid. default: [0]",
@@ -292,7 +284,8 @@ docker.add_argument(
 )
 
 opt = parser.add_argument_group("info")
-opt.add_argument("-v", "--version", action="version", version="%(prog)s " + VERSION)
+opt.add_argument("-v", "--version", action="version",
+                 version="%(prog)s " + VERSION)
 
 # Arg Parse
 args = parser.parse_args()
@@ -307,6 +300,8 @@ error = "\u001b[31m"
 reset = "\u001b[0m"
 
 # Banner
+
+
 def banner(t=0.0005):
     data = f"""{green}
 __      _____  _____              _____            
@@ -393,7 +388,8 @@ def dnsselect():
 
     global both, google, cloudflare, opendns, quad9, adguard, NODNS
     global dnslist
-    dnslist = ["both", "google", "cloudflare", "opendns", "quad9", "adguard", "nodns"]
+    dnslist = ["both", "google", "cloudflare",
+               "opendns", "quad9", "adguard", "nodns"]
 
     both = """"dns": {
       "servers": [
@@ -436,7 +432,7 @@ def dnsselect():
   },"""
 
     NODNS = ""
-        
+
 # def get_distro() -> str:
 # 	"""
 # 	return distro name
@@ -774,7 +770,8 @@ def client_side_vmess_configuration():
 
         print("")
         print(blue + "! Client-side VMess Config Generated.", reset)
-        print(blue + f"! Use {name} for using proxy with v2ray-core directly.", reset)
+        print(
+            blue + f"! Use {name} for using proxy with v2ray-core directly.", reset)
 
 
 def vmess_simple():
@@ -802,7 +799,8 @@ def shadowsocks_make(method) -> str:
 
     with open(SHADOWSOCKS, "w") as txt:
         txt.write(
-            json.dumps(shadowsocks_config(method, password=args.sspass), indent=2)
+            json.dumps(shadowsocks_config(
+                method, password=args.sspass), indent=2)
         )
         txt.close
 
@@ -996,12 +994,14 @@ def run_docker():
         # Install docker if docker are not installed
         try:
             print(yellow + "Docker Not Found.\nInstalling Docker ...")
-            subprocess.run("curl https://get.docker.com | sh", shell=True, check=True)
+            subprocess.run("curl https://get.docker.com | sh",
+                           shell=True, check=True)
         except subprocess.CalledProcessError:
             sys.exit(error + "Download Failed !" + reset)
 
     # Check if Docker Service is Enabled
-    systemctl = subprocess.call(["systemctl", "is-active", "--quiet", "docker"])
+    systemctl = subprocess.call(
+        ["systemctl", "is-active", "--quiet", "docker"])
     if systemctl == 0:
         pass
     else:
@@ -1028,7 +1028,8 @@ def run_docker():
             shell=True,
             check=True,
         )
-        subprocess.run("chmod +x /usr/local/bin/docker-compose", shell=True, check=True)
+        subprocess.run("chmod +x /usr/local/bin/docker-compose",
+                       shell=True, check=True)
         subprocess.run(
             "ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose",
             shell=True,
@@ -1085,7 +1086,8 @@ def vmess_link_generator(vmess_config_name) -> str:
 
     link = base64.b64encode(raw_link)  # encode raw link
 
-    vmess_link = prelink + str(link.decode("utf-8"))  # concatenate prelink with rawlink
+    # concatenate prelink with rawlink
+    vmess_link = prelink + str(link.decode("utf-8"))
 
     return vmess_link
 
